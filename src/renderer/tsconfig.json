@@ -1,0 +1,30 @@
+{
+  "references": [
+    { "path": "../../subs/typisch/src/core" },
+    { "path": "../../subs/typisch/src/earthapp" },
+    { "path": "../../subs/typisch/src/electron" },
+    { "path": "../../subs/typisch/src/eui" },
+    { "path": "../../subs/typisch/src/react" }
+  ],
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "es2020",
+    "lib": ["dom"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "jsx": "react",
+    "strict": true,
+    "useUnknownInCatchVariables": false,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "outDir": "../../build/tsc/renderer",
+    "moduleResolution": "node",
+    "target": "es2021",
+    "rootDir": "../.."
+  },
+  "include": [
+    "**/*",
+    "../common/**/*"
+  ]
+}

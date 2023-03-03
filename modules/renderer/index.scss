@@ -1,0 +1,15 @@
+
+// NOTE: gradle does not check these for changes, so if you update these, increase this number: [3]
+//@import "../../node_modules/@elastic/eui/src/themes/amsterdam/theme_dark";
+@import "../../node_modules/@elastic/eui/dist/eui_theme_dark";
+//@import "../../node_modules/@elastic/eui/dist/eui_theme_light";
+
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+}
+#root {
+  height: 100%;
+}

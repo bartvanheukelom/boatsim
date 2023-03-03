@@ -1,0 +1,9 @@
+/sqldiff
+/sqlite3
+/sqlite3_analyzer
+/.gradle
+/build
+/node_modules
+/data/*/fuse
+~daemon.run
+_local

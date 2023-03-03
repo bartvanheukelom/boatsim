@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CatDog</title>
+
+    <link rel="stylesheet" href="index.css">
+    <!-- TODO local - https://elastic.github.io/eui/#/guidelines/getting-started#fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10,300..700;0,300..700&family=Roboto+Mono:ital,wght@0,400..700;1,400..700&display=swap" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <script type="application/javascript">
+        if (!window.process) {
+            window.process = {
+                type: 'renderer',
+                isNotElectron: true,
+                env: {
+                    NODE_ENV: 'development',
+                },
+            };
+        }
+    </script>
+    <script type="module" src="index.js"></script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

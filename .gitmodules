@@ -1,0 +1,6 @@
+[submodule "subs/jbali"]
+	path = subs/jbali
+	url = https://github.com/bartvanheukelom/jbali.git
+[submodule "subs/typisch"]
+	path = subs/typisch
+	url = https://github.com/bartvanheukelom/typisch

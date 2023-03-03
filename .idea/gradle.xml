@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/modules" />
+            <option value="$PROJECT_DIR$/modules/main" />
+            <option value="$PROJECT_DIR$/modules/renderer" />
+            <option value="$PROJECT_DIR$/subs" />
+            <option value="$PROJECT_DIR$/subs/typisch" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs/core" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs/earthapp" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs/electron" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs/eui" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs/node" />
+            <option value="$PROJECT_DIR$/subs/typisch/packs/react" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

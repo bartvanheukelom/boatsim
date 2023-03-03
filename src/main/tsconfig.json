@@ -1,0 +1,27 @@
+{
+  "references": [
+    { "path": "../../subs/typisch/src/core" },
+    { "path": "../../subs/typisch/src/earthapp" },
+    { "path": "../../subs/typisch/src/electron" },
+    { "path": "../../subs/typisch/src/node" }
+  ],
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "CommonJS",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "useUnknownInCatchVariables": false,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "outDir": "../../build/tsc/main",
+    "moduleResolution": "node",
+    "target": "es2021",
+    "rootDir": "../.."
+  },
+  "include": [
+    "**/*",
+    "../common/**/*"
+  ]
+}
