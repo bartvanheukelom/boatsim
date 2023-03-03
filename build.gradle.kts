@@ -74,6 +74,17 @@ val npmInstall = tasks.register("npmInstall") {
 			"--shamefully-hoist"
 		) }
 		
+		// delete possibly invalid links before electron-rebuild
+		typischPacks.forEach {
+			val link = File(nodeModules, "@typisch/$it")
+			val target = file("subs/typisch/build/$it")
+			link.parentFile.mkdirs()
+			check(link.parentFile.isDirectory)
+			exec {
+				commandLine("rm", link)
+			}
+		}
+		
 		exec {
 			workingDir = projectDir
 			// TODO this poisons PNPM's centrally stored version, do something about that
