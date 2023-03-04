@@ -68,8 +68,19 @@ export function runSim(canvas: HTMLCanvasElement) {
     camera.attachControl(canvas, true);
     const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
 
+    let t = 0;
+    engine.runRenderLoop(() => {
 
-    engine.runRenderLoop(() => scene.render());
+        const f = 1.5;
+        const a = 0.4;
+        boat.rotation.x = Math.sin(t * f) * (Math.PI / 8) * a;
+
+        scene.render();
+        t += 1/60;
+    });
+
+
+
 
     return {
         sim: {
