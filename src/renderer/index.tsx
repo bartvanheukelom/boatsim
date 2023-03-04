@@ -8,7 +8,7 @@ export { RenderFunction, Consumer, ToastShow, AppContext } from "@typisch/eui/eu
 
 // TODO make the module work with ipcRenderer shim (not to send logs, but to not crash)
 // TODO rename sendLogsToMain
-// sendLogsToRenderer()
+// sendLogsToRenderer();
 
 // let progress: Progress = {};
 
