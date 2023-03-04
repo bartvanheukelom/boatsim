@@ -13,6 +13,7 @@ import {
 import { useUpdater } from "@typisch/react/hooks";
 import {Color4} from "@babylonjs/core/Maths/math.color";
 import {runSim} from "./sim";
+import {HUD} from "./HUD";
 
 export function App() {
 
@@ -59,5 +60,10 @@ export function App() {
         }
     }); // TODO only if size changed
 
-    return <canvas ref={canvas} style={{width: "100%", height: "100%"}} />;
+    return <>
+        <canvas ref={canvas} style={{width: "100%", height: "100%"}} />
+        <div style={{position: "absolute", top: "10px", left: "10px", width: "150px"}}>
+            <HUD windAngle={180} setWindAngle={() => {}} />
+        </div>
+    </>;
 }
