@@ -6,6 +6,7 @@ specifiers:
   '@aws-sdk/credential-provider-ini': ^3.54.0
   '@aws-sdk/lib-storage': ^3.54.0
   '@babel/core': ^7.0.0
+  '@babylonjs/core': ^5.49.0
   '@elastic/datemath': ^5.0.3
   '@elastic/eui': ^74.0.1
   '@electron/rebuild': ^3.2.10
@@ -61,6 +62,7 @@ dependencies:
   '@aws-sdk/credential-provider-ini': 3.259.0
   '@aws-sdk/lib-storage': 3.259.0_@aws-sdk+client-s3@3.259.0
   '@babel/core': 7.20.12
+  '@babylonjs/core': 5.49.0
   '@elastic/datemath': 5.0.3_moment@2.29.4
   '@elastic/eui': 74.0.1_uhwxqig3daodkgaol3cggtolpi
   '@emotion/cache': 11.10.5
@@ -1384,6 +1386,10 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+    dev: false
+
+  /@babylonjs/core/5.49.0:
+    resolution: {integrity: sha512-7DImzPWYqx8ZUIiBQbPMZWZOjCsNU1W50rGCEMg79vB1GJWicwoXG9fNCsnoK0P7vN6GhqpqwpKADYKQT/ngkg==}
     dev: false
 
   /@base2/pretty-print-object/1.0.1:
