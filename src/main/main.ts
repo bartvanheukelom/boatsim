@@ -1,13 +1,14 @@
 import path from "path";
-import {app, BrowserWindow, ipcMain, nativeTheme, globalShortcut, session} from "electron";
+import {app, BrowserWindow, nativeTheme} from "electron";
 import windowStateKeeper from "electron-window-state";
 import {launch} from "@typisch/core/async";
 import {pimpConsoleLog} from "@typisch/earthapp/main/logging";
-import {installReactDevTools, setUpDevTools} from "@typisch/earthapp/main/devTools";
+import {installReactDevTools} from "@typisch/earthapp/main/devTools";
 import {handleIpcMainLogs} from "@typisch/electron/utils";
 import {flock} from "fs-ext"
 import {promisify} from "util";
 import * as fs from "fs";
+
 const fsp = fs.promises;
 
 const flockp = promisify<number, 'sh' | 'ex' | 'shnb' | 'exnb' | 'un'>(flock)
@@ -37,9 +38,9 @@ launch(appMain);
 async function appMain() {
 
     // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-    if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
-        app.quit();
-    }
+    // if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+    //     app.quit();
+    // }
 
     installReactDevTools();
     nativeTheme.themeSource = "dark";

@@ -1,11 +1,8 @@
-import ReactOrg, {useEffect} from "react";
-
+import ReactOrg from "react";
 import ReactDOM from "react-dom"
-import './importIcons'
 // import {sendLogsToRenderer} from "@typisch/electron/utils";
-import {appHooks} from "@typisch/eui/euiApp";
-import {Tab} from "./context";
-import {fillIconCache} from "./importIcons";
+import {App} from "./app";
+// import {fillIconCache} from "./importIcons";
 
 export { RenderFunction, Consumer, ToastShow, AppContext } from "@typisch/eui/euiApp";
 
@@ -24,25 +21,9 @@ const React = ReactOrg;
 //     }
 // }
 
-fillIconCache();
+// fillIconCache();
 
 function render() {
     ReactDOM.render(<App />, document.getElementById("root"));
 }
 render()
-
-type TabsObj = { [n: string]: Tab };
-
-function App() {
-
-    const me = "App";
-    const app = appHooks();
-
-    useEffect(() => {
-        console.log(`${me} mounting`);
-        return () => console.log(`${me} unmounting`);
-    }, []);
-
-
-    return <p>HOI</p>;
-}
