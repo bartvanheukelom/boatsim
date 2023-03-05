@@ -3,7 +3,7 @@ import {
     ArcRotateCamera,
     Color3,
     Engine,
-    HemisphericLight,
+    HemisphericLight, Mesh,
     MeshBuilder,
     Scene,
     Space,
@@ -35,9 +35,10 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     // water.reflectionTexture.gammaSpace = false;
     // water.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
 
+    const ww = 100;
+    const hww = ww / 2;
 
-
-    const water = MeshBuilder.CreateGround("water", {width:1000, height:1000}, scene);
+    const water = MeshBuilder.CreateGround("water", {width:ww, height:ww}, scene);
     water.material = waterMat;
 
 
@@ -82,6 +83,18 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     camera.attachControl(canvas, true);
     const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
 
+    const airMat = new StandardMaterial("air", scene);
+    airMat.diffuseColor = new Color3(1, 0, 0);
+    const airs: Mesh[] = [];
+    for (let i = 0; i < 3000; i++) {
+        const air = MeshBuilder.CreateSphere("air", {diameter: 0.1}, scene);
+        air.position.x = Math.random() * ww - hww;
+        air.position.y = Math.random() * 7;
+        air.position.z = Math.random() * ww - hww;
+        air.material = airMat;
+        airs.push(air);
+    }
+
     let t = 0;
     engine.runRenderLoop(() => {
 
@@ -95,14 +108,30 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
 
         // add a tilt based on windAngle (where y+ is up)
         const waRadians = (input.windAngle * Math.PI / 180) + Math.PI;
-        const windVec = new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians));
+        const windVec = new Vector3(Math.sin(waRadians) * input.windSpeed, 0, Math.cos(waRadians) * input.windSpeed);
 
-        const tiltAngle = (Math.PI * 2) * 0.05;
+        for (const air of airs) {
+            air.position.addInPlace(windVec.scale(1/60));
+            if (air.position.x < -hww) {
+                air.position.x += ww;
+            }
+            if (air.position.x > hww) {
+                air.position.x -= ww;
+            }
+            if (air.position.z < -hww) {
+                air.position.z += ww;
+            }
+            if (air.position.z > hww) {
+                air.position.z -= ww;
+            }
+        }
+
+        const tiltAngle = (Math.PI * 2) * 0.005;
         // boat.rotation.z += Math.sin(waRadians) * tiltAngle * a;
         // boat.rotation.y += Math.cos(waRadians) * tiltAngle * a;
         // boat.rotate(new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians)), tiltAngle, Space.WORLD);
-        boat.rotate(new Vector3(0, 0, 1), tiltAngle * windVec.x, Space.LOCAL);
-        boat.rotate(new Vector3(1, 0, 0), tiltAngle * windVec.z * 0.12, Space.LOCAL);
+        boat.rotate(new Vector3(0, 0, 1), -tiltAngle * windVec.x, Space.LOCAL);
+        boat.rotate(new Vector3(1, 0, 0), -tiltAngle * windVec.z * 0.12, Space.LOCAL);
 
         // bob bob bob
         boat.rotate(new Vector3(1, 0, 0), Math.sin(t * 2) * Math.PI * 0.01, Space.WORLD);

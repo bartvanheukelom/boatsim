@@ -14,6 +14,11 @@ export function HUD(props: {
             />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
+            <EuiRange value={props.input.windSpeed} onChange={e => props.updateInput(i => i.windSpeed = parseFloat(e.currentTarget.value))}
+                      min={0} max={100} step={0.1}
+            />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
             <EuiRange value={props.input.sailAngle} onChange={e => props.updateInput(i => i.sailAngle = parseFloat(e.currentTarget.value))}
                       min={-80} max={80} step={1}
             />

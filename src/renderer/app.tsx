@@ -30,6 +30,7 @@ export function App() {
     // MUTABLE
     const simInput = useMemo(() => ({
         windAngle: 180,
+        windSpeed: 10,
         sailAngle: 0,
     }), []);
 
