@@ -1,17 +1,17 @@
-import React, {useEffect, useLayoutEffect, useRef} from "react";
-import { appHooks } from "@typisch/eui/euiApp";
+import React from "react";
 import {
-    ArcRotateCamera, Color3,
+    ArcRotateCamera,
+    Color3,
     Engine,
     HemisphericLight,
     MeshBuilder,
-    Scene, Space,
-    StandardMaterial, Texture,
+    Scene,
+    Space,
+    StandardMaterial,
+    Texture,
     TransformNode,
     Vector3
 } from "@babylonjs/core";
-import { useUpdater } from "@typisch/react/hooks";
-import {Color4} from "@babylonjs/core/Maths/math.color";
 import {SimInput} from "./types";
 
 export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
@@ -110,7 +110,7 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
         boat.rotate(new Vector3(0, 0, 1), Math.sin(t * 0.621) * Math.PI * 0.01, Space.WORLD);
 
         sail.rotationQuaternion = null;
-        sail.rotate(new Vector3(0, 1, 0), waRadians + Math.PI, Space.LOCAL);
+        sail.rotate(new Vector3(0, 1, 0), -degToRad(input.sailAngle) + Math.PI, Space.LOCAL);
 
         scene.render();
         t += 1/60;
@@ -129,4 +129,8 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
         }
     }
 
+}
+
+function degToRad(deg: number) {
+    return deg * Math.PI / 180;
 }

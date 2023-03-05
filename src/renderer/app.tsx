@@ -1,17 +1,7 @@
-import React, {useEffect, useLayoutEffect, useMemo, useRef} from "react";
-import { appHooks } from "@typisch/eui/euiApp";
-import {
-    ArcRotateCamera, Color3,
-    Engine,
-    HemisphericLight,
-    MeshBuilder,
-    Scene,
-    StandardMaterial, Texture,
-    TransformNode,
-    Vector3
-} from "@babylonjs/core";
-import { useUpdater } from "@typisch/react/hooks";
-import {Color4} from "@babylonjs/core/Maths/math.color";
+import React, {useEffect, useMemo, useRef} from "react";
+import {appHooks} from "@typisch/eui/euiApp";
+import {Engine} from "@babylonjs/core";
+import {useUpdater} from "@typisch/react/hooks";
 import {runSim} from "./sim";
 import {HUD} from "./HUD";
 
@@ -40,6 +30,7 @@ export function App() {
     // MUTABLE
     const simInput = useMemo(() => ({
         windAngle: 180,
+        sailAngle: 0,
     }), []);
 
 
@@ -70,8 +61,8 @@ export function App() {
     return <>
         <canvas ref={canvas} style={{width: "100%", height: "100%"}} />
         <div style={{position: "absolute", top: "10px", left: "10px", width: "150px"}}>
-            <HUD windAngle={simInput.windAngle} setWindAngle={a => {
-                simInput.windAngle = a;
+            <HUD input={simInput} updateInput={u => {
+                u(simInput);
                 updater.update();
             }} />
         </div>
