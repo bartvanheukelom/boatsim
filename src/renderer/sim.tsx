@@ -94,11 +94,15 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
         // boat.rotation.x = Math.sin(t * f) * (Math.PI / 8) * a;
 
         // add a tilt based on windAngle (where y+ is up)
-        const waRadians = input.windAngle * Math.PI / 180;
+        const waRadians = (input.windAngle * Math.PI / 180) + Math.PI;
+        const windVec = new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians));
+
         const tiltAngle = (Math.PI * 2) * 0.05;
         // boat.rotation.z += Math.sin(waRadians) * tiltAngle * a;
         // boat.rotation.y += Math.cos(waRadians) * tiltAngle * a;
-        boat.rotate(new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians)), tiltAngle, Space.WORLD);
+        // boat.rotate(new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians)), tiltAngle, Space.WORLD);
+        boat.rotate(new Vector3(0, 0, 1), tiltAngle * windVec.x, Space.LOCAL);
+        boat.rotate(new Vector3(1, 0, 0), tiltAngle * windVec.z * 0.12, Space.LOCAL);
 
         // bob bob bob
         boat.rotate(new Vector3(1, 0, 0), Math.sin(t * 2) * Math.PI * 0.01, Space.WORLD);
@@ -106,7 +110,7 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
         boat.rotate(new Vector3(0, 0, 1), Math.sin(t * 0.621) * Math.PI * 0.01, Space.WORLD);
 
         sail.rotationQuaternion = null;
-        sail.rotate(new Vector3(0, 1, 0), waRadians - (Math.PI * 0.5), Space.LOCAL);
+        sail.rotate(new Vector3(0, 1, 0), waRadians + Math.PI, Space.LOCAL);
 
         scene.render();
         t += 1/60;
