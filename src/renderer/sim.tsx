@@ -3,7 +3,7 @@ import {
     ArcRotateCamera,
     Color3,
     Engine,
-    HemisphericLight, Mesh,
+    HemisphericLight, InstancedMesh, Mesh,
     MeshBuilder,
     Scene,
     Space,
@@ -35,7 +35,7 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     // water.reflectionTexture.gammaSpace = false;
     // water.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
 
-    const ww = 100;
+    const ww = 32;
     const hww = ww / 2;
 
     const water = MeshBuilder.CreateGround("water", {width:ww, height:ww}, scene);
@@ -85,14 +85,17 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
 
     const airMat = new StandardMaterial("air", scene);
     airMat.diffuseColor = new Color3(1, 0, 0);
-    const airs: Mesh[] = [];
-    for (let i = 0; i < 3000; i++) {
-        const air = MeshBuilder.CreateSphere("air", {diameter: 0.1}, scene);
-        air.position.x = Math.random() * ww - hww;
-        air.position.y = Math.random() * 7;
-        air.position.z = Math.random() * ww - hww;
-        air.material = airMat;
-        airs.push(air);
+    const airs: InstancedMesh[] = [];
+    const air = MeshBuilder.CreateSphere("air", {diameter: 0.1}, scene);
+    air.material = airMat;
+    air.isVisible = false;
+    const airsPerM3 = 1/100;
+    for (let i = 0; i < (ww*ww*ww) * airsPerM3; i++) {
+        const airi = air.createInstance("air" + i);
+        airi.position.x = Math.random() * ww - hww;
+        airi.position.y = Math.random() * 7;
+        airi.position.z = Math.random() * ww - hww;
+        airs.push(airi);
     }
 
     let t = 0;
