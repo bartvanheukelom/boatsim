@@ -5,15 +5,16 @@ import {
     Engine,
     HemisphericLight,
     MeshBuilder,
-    Scene,
+    Scene, Space,
     StandardMaterial, Texture,
     TransformNode,
     Vector3
 } from "@babylonjs/core";
 import { useUpdater } from "@typisch/react/hooks";
 import {Color4} from "@babylonjs/core/Maths/math.color";
+import {SimInput} from "./types";
 
-export function runSim(canvas: HTMLCanvasElement) {
+export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
 
     const engine = new Engine(canvas, true);
 
@@ -61,7 +62,7 @@ export function runSim(canvas: HTMLCanvasElement) {
     }, scene);
     mast.material = blackAlu;
     mast.position.y = (6 + 0.75) / 2;
-    mast.position.z = 2;
+    mast.position.z = 1;
     mast.parent = boat;
 
     const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new Vector3(0, 0, 0), scene);
@@ -73,7 +74,19 @@ export function runSim(canvas: HTMLCanvasElement) {
 
         const f = 1.5;
         const a = 0.4;
-        boat.rotation.x = Math.sin(t * f) * (Math.PI / 8) * a;
+
+        boat.rotationQuaternion = null;
+
+        // bob bob bob - TODO QUATERNION
+        // boat.rotation.x = Math.sin(t * f) * (Math.PI / 8) * a;
+
+        // add a tilt based on windAngle (where y+ is up)
+        const waRadians = input.windAngle * Math.PI / 180;
+        const tiltAngle = (Math.PI * 2) * 0.05;
+        // boat.rotation.z += Math.sin(waRadians) * tiltAngle * a;
+        // boat.rotation.y += Math.cos(waRadians) * tiltAngle * a;
+        boat.rotate(new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians)), tiltAngle, Space.WORLD);
+
 
         scene.render();
         t += 1/60;

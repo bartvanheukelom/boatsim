@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useRef} from "react";
+import React, {useEffect, useLayoutEffect, useMemo, useRef} from "react";
 import { appHooks } from "@typisch/eui/euiApp";
 import {
     ArcRotateCamera, Color3,
@@ -36,6 +36,13 @@ export function App() {
         return () => console.log(`${me} unmounting`);
     }, []);
 
+
+    // MUTABLE
+    const simInput = useMemo(() => ({
+        windAngle: 180,
+    }), []);
+
+
     const canvas = useRef<HTMLCanvasElement | null>(null);
     const bab = useRef<{
         engine: Engine;
@@ -44,7 +51,7 @@ export function App() {
         console.log(`FX engine init; canvas.current=${canvas.current}`);
         if (canvas.current) {
 
-            const s = runSim(canvas.current);
+            const s = runSim(canvas.current, simInput);
             bab.current = s.sim;
             return () => {
                 s.stop();
@@ -63,7 +70,10 @@ export function App() {
     return <>
         <canvas ref={canvas} style={{width: "100%", height: "100%"}} />
         <div style={{position: "absolute", top: "10px", left: "10px", width: "150px"}}>
-            <HUD windAngle={180} setWindAngle={() => {}} />
+            <HUD windAngle={simInput.windAngle} setWindAngle={a => {
+                simInput.windAngle = a;
+                updater.update();
+            }} />
         </div>
     </>;
 }
