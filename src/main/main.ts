@@ -3,7 +3,7 @@ import {app, BrowserWindow, nativeTheme} from "electron";
 import windowStateKeeper from "electron-window-state";
 import {launch} from "@typisch/core/async";
 import {pimpConsoleLog} from "@typisch/earthapp/main/logging";
-import {installReactDevTools} from "@typisch/earthapp/main/devTools";
+import {installReactDevTools, setUpDevTools} from "@typisch/earthapp/main/devTools";
 import {handleIpcMainLogs} from "@typisch/electron/utils";
 import {flock} from "fs-ext"
 import {promisify} from "util";
@@ -86,7 +86,7 @@ async function appMain() {
                 await mainWindow.loadFile(indexPath);
                 console.log(`Index loaded`)
 
-                // setUpDevTools(mainWindow, openDevTools)
+                setUpDevTools(mainWindow, true);
 
                 console.log(`App window init done`)
 

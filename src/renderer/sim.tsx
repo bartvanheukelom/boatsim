@@ -4,7 +4,7 @@ import {
     Color3,
     Engine,
     HemisphericLight, InstancedMesh, Mesh,
-    MeshBuilder,
+    MeshBuilder, Quaternion,
     Scene,
     Space,
     StandardMaterial,
@@ -13,12 +13,20 @@ import {
     Vector3
 } from "@babylonjs/core";
 import {SimInput} from "./types";
+import * as CN from "cannon-es";
+
+
 
 export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
 
     const engine = new Engine(canvas, true);
 
     const scene = new Scene(engine);
+
+    const gravity = 9.82;
+    const cWorld = new CN.World({
+        gravity: new CN.Vec3(0, -gravity, 0),
+    });
 
 
     const waterMat = new StandardMaterial("water", scene);
@@ -50,8 +58,40 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     const offWhiteCloth = new StandardMaterial("offWhiteCloth", scene);
     offWhiteCloth.diffuseColor = new Color3(1, 1, 0.9);
 
+    const boatBodySize = { x: 1, y: 0.75, z: 6 };
+    const boatCOM = { x: 0, y: -0.25, z: 0 }; // center of mass, TODO calculate from masses of shapes
+    const keelSize = { x: 0.2, y: 0.2, z: boatBodySize.z / 2 };
+    const keelOffset = { x: 0, y: -boatBodySize.y/2 - keelSize.y/2, z: 0 };
+
+    const cBoat = new CN.Body({
+        mass: 1,
+        position: new CN.Vec3(0, 0, 0),
+    });
+    const cBoatOffset = new CN.Vec3(-boatCOM.x, -boatCOM.y, -boatCOM.z);
+    // main body
+    cBoat.addShape(
+        new CN.Box(new CN.Vec3(
+            boatBodySize.x / 2,
+            boatBodySize.y / 2,
+            boatBodySize.z / 2,
+        )),
+        cBoatOffset,
+    );
+    // heavy keel
+    cBoat.addShape(
+        new CN.Box(new CN.Vec3(
+            keelSize.x / 2,
+            keelSize.y / 2,
+            keelSize.z / 2,
+        )),
+        new CN.Vec3(keelOffset.x, keelOffset.y, keelOffset.z).vadd(cBoatOffset),
+    );
+    cWorld.addBody(cBoat);
+
+    const boatAtCOM = new TransformNode("boatAtCOM", scene);
     const boat = new TransformNode("boat", scene);
-    const body = MeshBuilder.CreateBox("body", {width: 1, height: 0.75, depth: 6}, scene);
+    boat.parent = boatAtCOM;
+    const body = MeshBuilder.CreateBox("body", {width: boatBodySize.x, height: boatBodySize.y, depth: boatBodySize.z}, scene);
     body.material = navyBlueWood;
     body.parent = boat;
     const mast = MeshBuilder.CreateBox("mast", {width: 0.1, height: 6, depth: 0.1,
@@ -68,6 +108,11 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     mast.position.y = (6 + 0.75) / 2;
     mast.position.z = 1;
     mast.parent = boat;
+
+    const keel = MeshBuilder.CreateBox("keel", {width: keelSize.x, height: keelSize.y, depth: keelSize.z}, scene);
+    keel.parent = boat;
+    keel.material = blackAlu;
+    keel.position.set(keelOffset.x, keelOffset.y, keelOffset.z);
 
     const sail = new TransformNode("sail", scene);
     sail.parent =  mast;
@@ -99,53 +144,129 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     }
 
     let t = 0;
+    let paused = false;
     engine.runRenderLoop(() => {
 
-        const f = 1.5;
-        const a = 0.4;
-
-        boat.rotationQuaternion = null;
-
-        // bob bob bob - TODO QUATERNION
-        // boat.rotation.x = Math.sin(t * f) * (Math.PI / 8) * a;
-
-        // add a tilt based on windAngle (where y+ is up)
-        const waRadians = (input.windAngle * Math.PI / 180) + Math.PI;
-        const windVec = new Vector3(Math.sin(waRadians) * input.windSpeed, 0, Math.cos(waRadians) * input.windSpeed);
-
-        for (const air of airs) {
-            air.position.addInPlace(windVec.scale(1/60));
-            if (air.position.x < -hww) {
-                air.position.x += ww;
-            }
-            if (air.position.x > hww) {
-                air.position.x -= ww;
-            }
-            if (air.position.z < -hww) {
-                air.position.z += ww;
-            }
-            if (air.position.z > hww) {
-                air.position.z -= ww;
-            }
+        // auto pause if boat sinks
+        if (cBoat.position.y < -20) {
+            paused = true;
         }
 
-        const tiltAngle = (Math.PI * 2) * 0.005;
-        // boat.rotation.z += Math.sin(waRadians) * tiltAngle * a;
-        // boat.rotation.y += Math.cos(waRadians) * tiltAngle * a;
-        // boat.rotate(new Vector3(Math.sin(waRadians), 0, Math.cos(waRadians)), tiltAngle, Space.WORLD);
-        boat.rotate(new Vector3(0, 0, 1), -tiltAngle * windVec.x, Space.LOCAL);
-        boat.rotate(new Vector3(1, 0, 0), -tiltAngle * windVec.z * 0.12, Space.LOCAL);
+        if (!paused) {
+            cWorld.step(1/60);
 
-        // bob bob bob
-        boat.rotate(new Vector3(1, 0, 0), Math.sin(t * 2) * Math.PI * 0.01, Space.WORLD);
-        boat.rotate(new Vector3(0, 0, 1), Math.sin(t * 1.5) * Math.PI * 0.01, Space.WORLD);
-        boat.rotate(new Vector3(0, 0, 1), Math.sin(t * 0.621) * Math.PI * 0.01, Space.WORLD);
+            const f = 1.5;
+            const a = 0.4;
 
-        sail.rotationQuaternion = null;
-        sail.rotate(new Vector3(0, 1, 0), -degToRad(input.sailAngle) + Math.PI, Space.LOCAL);
+            // boat.rotationQuaternion = null;
+
+            // bob bob bob - TODO QUATERNION
+            // boat.rotation.x = Math.sin(t * f) * (Math.PI / 8) * a;
+
+            // add a tilt based on windAngle (where y+ is up)
+            const waRadians = (input.windAngle * Math.PI / 180) + Math.PI;
+            const windVec = new Vector3(Math.sin(waRadians) * input.windSpeed, 0, Math.cos(waRadians) * input.windSpeed);
+
+            for (const air of airs) {
+                air.position.addInPlace(windVec.scale(1/60));
+                if (air.position.x < -hww) {
+                    air.position.x += ww;
+                }
+                if (air.position.x > hww) {
+                    air.position.x -= ww;
+                }
+                if (air.position.z < -hww) {
+                    air.position.z += ww;
+                }
+                if (air.position.z > hww) {
+                    air.position.z -= ww;
+                }
+            }
+
+
+
+            // sample a 3d grid of points in cBoat, convert to world space,
+            // and apply a force to the boat based on their depth in the water, ie their y value
+            const sd = 0.1;
+            const slicesX = 3; // Math.ceil(boatBodySize.x / sd);
+            const slicesY = 3; //Math.ceil(boatBodySize.y / sd);
+            const slicesZ = 9; //Math.ceil(boatBodySize.z / sd);
+
+            const swx = boatBodySize.x / slicesX; // slice width x
+            const swy = boatBodySize.y / slicesY; // slice width y
+            const swz = boatBodySize.z / slicesZ; // slice width z
+            const sliceVolume = swx * swy * swz;
+
+            for (let ix = 0; ix < slicesX; ix++) {
+                const sx = (ix * swx) + swx/2 - boatBodySize.x/2; // center of slice x
+                for (let iy = 0; iy < slicesY; iy++) {
+                    const sy = (iy * swy) + swy/2 - boatBodySize.y/2; // center of slice y
+                    for (let iz = 0; iz < slicesZ; iz++) {
+                        const sz = (iz * swz) + swz/2 - boatBodySize.z/2; // center of slice z
+
+                        // centerpoint of slice in boat space
+                        const p = new CN.Vec3(sx, sy, sz);
+                        // centerpoint of slice in world space
+                        const pWorld = cBoat.pointToWorldFrame(p);
+                        // console.log(`slice[${ix},${iy},${iz}] p=${p.toString()} pWorld=${pWorld.toString()}`);
+
+                        if (pWorld.y < 0) {
+                            // TODO if not fully submerged, correct volume approximately
+
+                            // buoyant force = fluid density * displacement volume * gravity
+                            const buoyantForce = 1 * sliceVolume * gravity;
+                            const force = new CN.Vec3(0, buoyantForce, 0);
+                            // console.log(`force=${force.toString()}`);
+                            cBoat.applyForce(force, cBoat.vectorToWorldFrame(p));
+                        }
+                    }
+                }
+            }
+
+            // apply wind force
+            const windForce = new CN.Vec3(windVec.x, 0, windVec.z)
+                .scale(0.1);
+            cBoat.applyForce(windForce, cBoat.vectorToWorldFrame(new CN.Vec3(0, 3, 0)));
+
+            // if boat goes too far from 0,*,0, nudge it back
+            const boatDistance: CN.Vec3 = cBoat.position.clone();
+            boatDistance.y = 0;
+            if (boatDistance.length() > 3) {
+
+                if (boatDistance.length() > 10) {
+                    paused = true; // applied next frame
+                }
+
+                const hysterisis = 0.5;
+                const nudgeForce = (boatDistance.length() - 3 + hysterisis) * 20;
+                let nudgeForceWorld = boatDistance.clone();
+                nudgeForceWorld.normalize(); // MUTATES! WHYYYYYYYYYYYY
+                nudgeForceWorld = nudgeForceWorld.scale(-nudgeForce);
+                console.log(`BOAT RUNNING AWAY! boatDistance=${boatDistance.toString()} nudgeForce=${nudgeForce} nudgeForceWorld=${nudgeForceWorld.toString()}`);
+                cBoat.applyForce(nudgeForceWorld, cBoat.vectorToWorldFrame(new CN.Vec3(0, 0, -3)));
+            }
+
+
+            const tiltAngle = (Math.PI * 2) * 0.005;
+            // boat.rotate(new Vector3(0, 0, 1), -tiltAngle * windVec.x, Space.LOCAL);
+            // boat.rotate(new Vector3(1, 0, 0), -tiltAngle * windVec.z * 0.12, Space.LOCAL);
+
+            // bob bob bob
+            // boat.rotate(new Vector3(1, 0, 0), Math.sin(t * 2) * Math.PI * 0.01, Space.WORLD);
+            // boat.rotate(new Vector3(0, 0, 1), Math.sin(t * 1.5) * Math.PI * 0.01, Space.WORLD);
+            // boat.rotate(new Vector3(0, 0, 1), Math.sin(t * 0.621) * Math.PI * 0.01, Space.WORLD);
+
+            sail.rotationQuaternion = null;
+            sail.rotate(new Vector3(0, 1, 0), -degToRad(input.sailAngle) + Math.PI, Space.LOCAL);
+
+            t += 1/60;
+        }
+
+        boatAtCOM.position.set(cBoat.position.x, cBoat.position.y, cBoat.position.z);
+        boatAtCOM.rotationQuaternion = new Quaternion(cBoat.quaternion.x, cBoat.quaternion.y, cBoat.quaternion.z, cBoat.quaternion.w);
 
         scene.render();
-        t += 1/60;
+
     });
 
 

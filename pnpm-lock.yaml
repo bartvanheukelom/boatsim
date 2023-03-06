@@ -30,6 +30,7 @@ specifiers:
   async-mutex: ^0.4.0
   better-sqlite3: ^8.0.1
   body-parser: ^1.19.0
+  cannon-es: ^0.20.0
   csv: ^6.2.1
   csv-stringify: ^6.2.1
   dropbox: ^10.26.0
@@ -72,6 +73,7 @@ dependencies:
   async-mutex: 0.4.0
   better-sqlite3: 8.0.1
   body-parser: 1.20.1
+  cannon-es: 0.20.0
   csv: 6.2.5
   csv-stringify: 6.2.3
   dropbox: 10.34.0
@@ -2701,6 +2703,10 @@ packages:
 
   /caniuse-lite/1.0.30001448:
     resolution: {integrity: sha512-tq2YI+MJnooG96XpbTRYkBxLxklZPOdLmNIOdIhvf7SNJan6u5vCKum8iT7ZfCt70m1GPkuC7P3TtX6UuhupuA==}
+    dev: false
+
+  /cannon-es/0.20.0:
+    resolution: {integrity: sha512-eZhWTZIkFOnMAJOgfXJa9+b3kVlvG+FX4mdkpePev/w/rP5V8NRquGyEozcjPfEoXUlb+p7d9SUcmDSn14prOA==}
     dev: false
 
   /ccount/1.1.0:
