@@ -58,13 +58,13 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
     const offWhiteCloth = new StandardMaterial("offWhiteCloth", scene);
     offWhiteCloth.diffuseColor = new Color3(1, 1, 0.9);
 
-    const boatBodySize = { x: 1, y: 0.75, z: 6 };
-    const boatCOM = { x: 0, y: -0.25, z: 0 }; // center of mass, TODO calculate from masses of shapes
-    const keelSize = { x: 0.2, y: 0.2, z: boatBodySize.z / 2 };
+    const boatBodySize = { x: 2, y: 0.75, z: 6 };
+    const keelSize = { x: 0.2, y: 0.6, z: 1 };
     const keelOffset = { x: 0, y: -boatBodySize.y/2 - keelSize.y/2, z: 0 };
+    const boatCOM = { x: 0, y: keelOffset.y * 0.9, z: 0 }; // center of mass, TODO calculate from masses of shapes
 
     const cBoat = new CN.Body({
-        mass: 1,
+        mass: 5,
         position: new CN.Vec3(0, 0, 0),
     });
     const cBoatOffset = new CN.Vec3(-boatCOM.x, -boatCOM.y, -boatCOM.z);
@@ -188,9 +188,9 @@ export function runSim(canvas: HTMLCanvasElement, input: SimInput) {
             // sample a 3d grid of points in cBoat, convert to world space,
             // and apply a force to the boat based on their depth in the water, ie their y value
             const sd = 0.1;
-            const slicesX = 3; // Math.ceil(boatBodySize.x / sd);
-            const slicesY = 3; //Math.ceil(boatBodySize.y / sd);
-            const slicesZ = 9; //Math.ceil(boatBodySize.z / sd);
+            const slicesX = 5; // Math.ceil(boatBodySize.x / sd);
+            const slicesY = 7; //Math.ceil(boatBodySize.y / sd);
+            const slicesZ = 13; //Math.ceil(boatBodySize.z / sd);
 
             const swx = boatBodySize.x / slicesX; // slice width x
             const swy = boatBodySize.y / slicesY; // slice width y
